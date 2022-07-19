@@ -36,3 +36,15 @@ variable "node_min_size" {
   type    = number
   description = "eks-node desired size"
 }
+
+variable "my_ami" {
+  default     = null
+  type        = string
+  description = "EC2 ami"
+}
+
+variable "my_keypair" {
+  default     = null
+  type        = string
+  description = "Key Pairs"
+}

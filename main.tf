@@ -20,3 +20,188 @@ module "eks" {
   subnet_id2 = module.vpc.private_subnet_id[1]
 }
 
+resource aws_instance "bastion" {
+  ami             = var.my_ami
+  instance_type   = "t2.micro"
+  subnet_id       = module.vpc.public_subnet_id[0]
+  security_groups = [aws_security_group.bastion_sg.id]
+  key_name    = var.my_keypair
+
+  tags = {
+    Name = "eshop-bastion-server" 
+  }
+}
+
+
+resource aws_instance "admin" {
+  
+  ami             = var.my_ami
+  instance_type   = "t2.micro"
+  subnet_id       = module.vpc.private_subnet_id[0]
+  security_groups = [aws_security_group.admin_sg.id]
+  key_name    = var.my_keypair
+  
+   user_data = <<EOF
+#!/bin/bash
+
+/usr/bin/echo  "#!/bin/bash                                                                                                                      " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# tree install                                                                                                                   " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "sudo apt update                                                                                                                  " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "sudo apt install -y tree                                                                                                         " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# unzip install                                                                                                                  " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "sudo apt update                                                                                                                  " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "sudo apt install -y unzip                                                                                                        " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# awscli v2 download and install                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# curl -o /home/ubuntu/awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip                                     " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# unzip /home/ubuntu/awscliv2.zip                                                                                                " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# sudo /home/ubuntu/aws/install                                                                                                  " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# awscli install                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "sudo apt update                                                                                                                  " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "sudo apt install -y awscli                                                                                                       " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# terraform install                                                                                                              " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -                                                           " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "sudo apt-add-repository -y 'deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main'  " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "sudo apt install -y terraform                                                                                                    " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "### kubectl install                                                                                                              " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "mkdir /home/ubuntu/bin                                                                                                           " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "curl -o /home/ubuntu/bin/kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.22.6/2022-03-09/bin/linux/amd64/kubectl         " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "chmod +x /home/ubuntu/bin/kubectl                                                                                                " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "echo 'alias cls=clear' >> /home/ubuntu/.bashrc                                                                                   " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "echo 'export PATH=$PATH:/home/ubuntu/bin' >> /home/ubuntu/.bashrc                                                                " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "echo 'source <(kubectl completion bash)' >> /home/ubuntu/.bashrc                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "echo 'alias k=kubectl' >> /home/ubuntu/.bashrc                                                                                   " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "echo 'complete -F __start_kubectl k' >> /home/ubuntu/.bashrc                                                                     " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# source /home/ubuntu/.bashrc                                                                                                    " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "# .kube/config                                                                                                                   " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "#aws eks update-kubeconfig --name eshop-mgmt-eks-cluster --alias=mgmt                                                                  " >> /home/ubuntu/mystart.sh
+
+/usr/bin/chmod +x /home/ubuntu/mystart.sh
+
+ EOF
+
+  tags = {
+    Name = "eshop-admin-server"
+  }
+}
+
+
+resource "aws_security_group" "bastion_sg" {
+  name        = "eshop_mgmt_bastion_sg"
+  vpc_id      = module.vpc.vpc_id
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "eshop_mgmt_bastion_sg"
+  }
+}
+
+resource "aws_security_group" "admin_sg" {
+  name        = "eshop_mgmt_admin_sg"
+  description = "admin server sg"
+  vpc_id      = module.vpc.vpc_id
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "eshop_mgmt_admin_sg"
+  }
+}
+
+data "http" "get_my_public_ip" {
+  url = "https://ifconfig.co/ip"
+}
+
+resource "aws_security_group_rule" "bastion-ssh-myip" {
+  description       = "my public ip"
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "TCP"
+
+  cidr_blocks       = ["${chomp(data.http.get_my_public_ip.body)}/32"] 
+  security_group_id = aws_security_group.bastion_sg.id
+}
+
+resource "aws_security_group_rule" "bastion-ssh-office" {
+  description       = "office"
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "TCP"
+
+  cidr_blocks       = ["121.133.133.0/24", "221.167.219.0/24"] 
+  security_group_id = aws_security_group.bastion_sg.id
+}
+
+resource "aws_security_group_rule" "bastion-ssh-us-east-1" {
+
+  count = var.aws_region == "us-east-1" ? 1 : 0
+
+  description       = "AWS EC2_INSTANCE_CONNECT - us-east-1"
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "TCP"
+
+  cidr_blocks       = ["18.206.107.24/29"] 
+  security_group_id = aws_security_group.bastion_sg.id
+}
+
+resource "aws_security_group_rule" "bastion-ssh-us-west-2" {
+
+  count = var.aws_region == "us-west-2" ? 1 : 0
+
+  description       = "AWS EC2_INSTANCE_CONNECT - us-west-2"
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "TCP"
+
+  cidr_blocks       = ["18.237.140.160/29"] 
+  security_group_id = aws_security_group.bastion_sg.id
+}
+
+resource "aws_security_group_rule" "bastion-ssh-ap-northeast-2" {
+
+  count = var.aws_region == "ap-northeast-2" ? 1 : 0
+
+  description       = "AWS EC2_INSTANCE_CONNECT - ap-northeast-2"
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "TCP"
+
+  cidr_blocks       = ["13.209.1.56/29"] 
+  security_group_id = aws_security_group.bastion_sg.id
+}
+
+resource "aws_security_group_rule" "admin-ssh" {
+  description              = "from bastion server"
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "TCP"
+  security_group_id        = aws_security_group.admin_sg.id
+  source_security_group_id = aws_security_group.bastion_sg.id
+}
