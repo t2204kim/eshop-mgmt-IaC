@@ -3,6 +3,11 @@
 ⓘ 목적 : 관리용 EKS Cluster / 관리용 Admin Server / 관리용 Bastion Server를 Provisioning 하기위해 IaC를 도입 및 운영에 활용한다.
 
 ## IaC Terraform 수행
+ - IaC Code 수행내역
+   관리용 VPC 및 Subnet, Route Table, Nat/Internet Gateway 생성 및 설정
+   관리용 EKS Cluster / EKS Node Group 생성 및 설정
+   관리용 Admin Server(kubectl 수행용) 생성, tree, unzip, awscli, terraform, kubectl 설치
+<br>
 
 ### 1. AWS EC2 **Key Pair**를 생성한다.
 
