@@ -83,9 +83,10 @@ resource aws_instance "admin" {
 /usr/bin/echo  "# source /home/ubuntu/.bashrc                                                                                                    " >> /home/ubuntu/mystart.sh
 /usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
 /usr/bin/echo  "# .kube/config                                                                                                                   " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "#aws eks update-kubeconfig --name eshop-mgmt-eks-cluster --alias=mgmt                                                                  " >> /home/ubuntu/mystart.sh
+/usr/bin/echo  "aws eks update-kubeconfig --name eshop-mgmt-eks-cluster --alias=mgmt                                                                  " >> /home/ubuntu/mystart.sh
 
 /usr/bin/chmod +x /home/ubuntu/mystart.sh
+bash /home/ubuntu/mystart.sh
 
  EOF
 
