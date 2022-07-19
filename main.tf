@@ -41,50 +41,39 @@ resource aws_instance "admin" {
   security_groups = [aws_security_group.admin_sg.id]
   key_name    = var.my_keypair
   
-   user_data = <<EOF
+  user_data = <<EOF
 #!/bin/bash
 
-/usr/bin/echo  "#!/bin/bash                                                                                                                      " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "# tree install                                                                                                                   " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "sudo apt update                                                                                                                  " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "sudo apt install -y tree                                                                                                         " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "# unzip install                                                                                                                  " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "sudo apt update                                                                                                                  " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "sudo apt install -y unzip                                                                                                        " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "# awscli v2 download and install                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "# curl -o /home/ubuntu/awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip                                     " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "# unzip /home/ubuntu/awscliv2.zip                                                                                                " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "# sudo /home/ubuntu/aws/install                                                                                                  " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "# awscli install                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "sudo apt update                                                                                                                  " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "sudo apt install -y awscli                                                                                                       " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "# terraform install                                                                                                              " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -                                                           " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "sudo apt-add-repository -y 'deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main'  " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "sudo apt install -y terraform                                                                                                    " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "### kubectl install                                                                                                              " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "mkdir /home/ubuntu/bin                                                                                                           " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "curl -o /home/ubuntu/bin/kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.22.6/2022-03-09/bin/linux/amd64/kubectl         " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "chmod +x /home/ubuntu/bin/kubectl                                                                                                " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "echo 'alias cls=clear' >> /home/ubuntu/.bashrc                                                                                   " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "echo 'export PATH=$PATH:/home/ubuntu/bin' >> /home/ubuntu/.bashrc                                                                " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "echo 'source <(kubectl completion bash)' >> /home/ubuntu/.bashrc                                                                 " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "echo 'alias k=kubectl' >> /home/ubuntu/.bashrc                                                                                   " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "echo 'complete -F __start_kubectl k' >> /home/ubuntu/.bashrc                                                                     " >> /home/ubuntu/mystart.sh
-/usr/bin/echo  "                                                                                                                                 " >> /home/ubuntu/mystart.sh
+# tree install                                                                                                          
+sudo apt update
+sudo apt install -y tree
 
-/usr/bin/chmod +x /home/ubuntu/mystart.sh
-/bin/bash /home/ubuntu/mystart.sh
+unzip install
+sudo apt update
+sudo apt install -y unzip
 
- EOF
+# awscli install
+sudo apt update
+sudo apt install -y awscli
+
+# terraform install
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository -y 'deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main'
+sudo apt install -y terraform
+
+### kubectl install
+mkdir /home/ubuntu/bin
+curl -o /home/ubuntu/bin/kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.22.6/2022-03-09/bin/linux/amd64/kubectl
+chmod +x /home/ubuntu/bin/kubectl
+
+echo 'alias cls=clear' >> /home/ubuntu/.bashrc
+echo 'export PATH=$PATH:/home/ubuntu/bin' >> /home/ubuntu/.bashrc
+
+echo 'source <(kubectl completion bash)' >> /home/ubuntu/.bashrc
+echo 'alias k=kubectl' >> /home/ubuntu/.bashrc
+echo 'complete -F __start_kubectl k' >> /home/ubuntu/.bashrc
+
+EOF
 
   tags = {
     Name = "eshop-admin-server"
