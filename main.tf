@@ -6,6 +6,9 @@ module "vpc" {
 
 
 module "eks" {
+  
+  depends_on = [module.vpc]
+
   source = "./eks_module"
 
   cluster_name      = var.cluster_name
@@ -21,6 +24,12 @@ module "eks" {
 }
 
 resource aws_instance "bastion" {
+  
+  depends_on = [
+    module.vpc,
+    module.eks
+  ]
+  
   ami             = var.my_ami
   instance_type   = "t2.micro"
   subnet_id       = module.vpc.public_subnet_id[0]
@@ -35,12 +44,18 @@ resource aws_instance "bastion" {
 
 resource aws_instance "admin" {
   
+  depends_on = [
+    module.vpc,
+    module.eks,
+    aws_instance.bastion
+  ]
+
   ami             = var.my_ami
   instance_type   = "t2.micro"
   subnet_id       = module.vpc.private_subnet_id[0]
   security_groups = [aws_security_group.admin_sg.id]
   key_name    = var.my_keypair
-  
+
   user_data = <<EOF
 #!/bin/bash
 
@@ -58,7 +73,7 @@ sudo apt install -y awscli
 
 # terraform install
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-sudo apt-add-repository -y 'deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main'
+sudo apt-add-repository -y "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 sudo apt install -y terraform
 
 ### kubectl install
