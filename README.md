@@ -68,16 +68,16 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.0.4/manifests/install.yaml
 kubectl patch service argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 ```
-
 <br>
+
 Argocd cli Install
 ```bash
 VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
 sudo curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$VERSION/argocd-linux-amd64
 sudo chmod +x /usr/local/bin/argocd
 ```
-
 <br>
+
 Argocd 초기 Password 확인
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
