@@ -54,6 +54,6 @@ resource "aws_eks_node_group" "terra" {
   depends_on = [
     aws_iam_role_policy_attachment.terra-node-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.terra-node-AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.terra-node-AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.terra-node-AmazonEC2ContainerRegistryFullAccess,
   ]
 }
