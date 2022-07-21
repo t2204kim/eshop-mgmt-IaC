@@ -33,8 +33,13 @@ resource "aws_iam_role_policy_attachment" "terra-node-AmazonEKS_CNI_Policy" {
   role       = aws_iam_role.terra-node.name
 }
 
-resource "aws_iam_role_policy_attachment" "terra-node-AmazonEC2ContainerRegistryFullAccess" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+resource "aws_iam_role_policy_attachment" "terra-node-AmazonEC2ContainerRegistryReadOnly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.terra-node.name
+}
+
+resource "aws_iam_role_policy_attachment" "terra-node-AmazonEC2ContainerRegistryPowerUser" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
   role       = aws_iam_role.terra-node.name
 }
 
@@ -54,6 +59,7 @@ resource "aws_eks_node_group" "terra" {
   depends_on = [
     aws_iam_role_policy_attachment.terra-node-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.terra-node-AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.terra-node-AmazonEC2ContainerRegistryFullAccess,
+    aws_iam_role_policy_attachment.terra-node-AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.terra-node-AmazonEC2ContainerRegistryPowerUser
   ]
 }
