@@ -33,8 +33,8 @@ resource "aws_iam_role_policy_attachment" "terra-node-AmazonEKS_CNI_Policy" {
   role       = aws_iam_role.terra-node.name
 }
 
-resource "aws_iam_role_policy_attachment" "terra-node-AmazonEC2ContainerRegistryReadOnly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+resource "aws_iam_role_policy_attachment" "terra-node-AmazonEC2ContainerRegistryFullAccess" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
   role       = aws_iam_role.terra-node.name
 }
 
