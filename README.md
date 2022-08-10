@@ -25,15 +25,15 @@
 
 ### 2. AWS Region 설정한다.
 
-- 아래 예시는 ap-northeast-2(Seoul) 리젼에서 진행
-- 아래 예시는 ap-northeast-2(Seoul) 리젼 내 Ubuntu 20.04 LTS 운영체제    
-  AMI ID : ami-0ea5eb4b05645aa8a
+- 아래 예시는 us-east-1 리젼에서 진행
+- 아래 예시는 us-east-1 리젼 내 Ubuntu 20.04 LTS 운영체제    
+  AMI ID : ami-08d4ac5b634553e16
 - terraform.tfvars
 
 ```bash
-1 aws_region = "ap-northeast-2"           # 개인이 사용할 리젼으로 변경
-2 my_ami     = "ami-0ea5eb4b05645aa8a"    # 개인이 사용할 리젼의 Ubuntu, 20.04 LTS x86 운영체제 AMI ID로 변경
-3 my_keypair = "MyKeyPair"                # 변경하지 않고 그대로 사용
+aws_region = "us-east-1"           # 개인이 사용할 리젼으로 변경
+my_ami     = "ami-08d4ac5b634553e16"    # 개인이 사용할 리젼의 Ubuntu, 20.04 LTS x86 운영체제 AMI ID로 변경
+my_keypair = "MyKeyPair"                # 변경하지 않고 그대로 사용
 ```
 
 <br>
