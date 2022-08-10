@@ -58,7 +58,35 @@ terraform apply
 ```
 <br>
 
-### 4. Argocd 설치
+
+### 4. AWS cli를 사용하기 위한 aws configure 설정을 한다.
+
+- 아래 admin server 접속방법 확인 후 생성된 Admin Server EC2에 접속한다.
+- 개인 mspmanager IAM계정에 발급된 Access Key 와 Secret Access Key 등록
+
+<br>
+
+```bash
+aws configure
+```
+<br>
+
+
+### 5. AWS MGMT EKS Cluster 인증정보 획득설정을 진행 한다.
+
+- 아래 admin server 접속방법 확인 후 생성된 Admin Server EC2에 접속한다.
+
+<br>
+
+```bash
+aws eks --region=us-east-1 update-kubeconfig --name=eshop-mgmt-eks-cluster --alias=mgmt
+```
+<br>
+
+
+### 6. Argocd 설치
+
+- 아래 admin server 접속방법 확인 후 생성된 Admin Server EC2에 접속한다.
 
 <br>
 
@@ -181,7 +209,6 @@ kubectl get service -n argocd
 
 - EC2 서비스에서 OS 버전 정보를 저장하는 /etc/issue 내용으로 확인한다. 
 - admin server 에서 `cat /etc/issue` 명령어를 수행해서 버전정보를 확인한다.
-  - 🚩 만약 설치된 버전이 Ubuntu 20.04가 아니라면, **기존의 admin server는 삭제**하고 **[1-8. Admin server 생성하기](#1-8-admin-serverec2-생성하기)** 부터 다시 수행해야 한다.
 
 ![](images/2022-08-03-13-58-32.png)
 
