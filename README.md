@@ -129,7 +129,7 @@ kubectl get service -n argocd
 
 <br>
 
-### **Admin Server 접속하기**
+### 별첨.**Admin Server 접속하기**
 
 - Bastion Server를 경유하여 Admin Server에 SSH로 접속하는 실습을 진행한다.
 
