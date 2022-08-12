@@ -126,7 +126,7 @@ kubectl get service -n argocd
 
 <br>
 
-### 별첨.**Admin Server 접속하기**
+## 별첨.**Admin Server 접속하기**
 
 - Bastion Server를 경유하여 Admin Server에 SSH로 접속하는 실습을 진행한다.
 
@@ -210,4 +210,154 @@ kubectl get service -n argocd
 ![](images/2022-08-03-13-58-32.png)
 
 <br>
+
 ---
+
+<br>
+
+## 별첨.ArgoCD Password 초기화 가이드     
+
+<br>
+
+ArgoCD의 Password 분실 시 PW를 초기화 할 수 있는 방법이다.
+
+---
+
+<br>
+<br>
+
+    
+1. 현재 비밀번호 삭제 - admin.password 와 admin.passwordMtime 의 key, value 2라인을 모두 지우고 저장 
+
+<br>
+
+1-1. ArgoCD Credential 관련 설정 변경창 열기    
+
+🧲 (COPY)     
+```bash
+kubectl edit secret argocd-secret -n argocd
+```       
+✔ **(수행코드/결과)**  
+
+![](images/ArgoCD/2022-05-11-20-02-ArgoCD-1.png)     
+
+<br>
+
+1-2. admin.password 및 admin.passwordMtime 두개 Line을 삭제 후 저장한다. (위 그림의 하얀 네모칸 부분)    
+
+![](images/ArgoCD/2022-05-11-20-02-ArgoCD-2.png)     
+
+<br>
+
+2. argocd-server pod 재시작     
+
+<br>
+
+2-1. argocd-server를 prefix로 가진 pod의 id를 파악하여 해당 pod을 삭제한다.(삭제하면 새로운 Pod이 뜨므로 재기동과 마찬가지)
+
+🧲 (COPY)     
+```bash
+kubectl get pods -n argocd | grep ^argocd-server- | cut -d ' ' -f1 | xargs -I %  kubectl delete pod % -n argocd
+```       
+
+✔ **(수행코드/결과)**  
+
+```bash
+ubuntu@ip-10-0-11-40:~$ kubectl get pods -n argocd | grep ^argocd-server- | cut -d ' ' -f1 | xargs -I %  kubectl delete pod % -n argocd
+pod "argocd-server-86f7f94488-5t7lx" deleted
+```       
+
+![](images/ArgoCD/2022-05-11-20-02-ArgoCD-3.png)        
+
+> 👉 argocd-server-* prefix를 가진 pod이 deleted된 결과 확인.(기존 argocd-server pod이 삭제되고 새로 생성되어 기동됨)        
+
+
+<br>
+
+3. 기존 pod 삭제 확인 및 신규 pod 생성 확인    
+
+<br>
+
+🧲 (COPY)     
+```bash
+kubectl get pods -n argocd
+```       
+✔ **(수행코드/결과)**  
+
+```bash
+ubuntu@ip-10-0-11-40:~$ kubectl get pods -n argocd
+NAME                                  READY   STATUS    RESTARTS   AGE
+argocd-application-controller-0       1/1     Running   0          4h46m
+argocd-dex-server-7946bfbf79-wtzgz    1/1     Running   0          4h46m
+argocd-redis-7547547c4f-rwzhl         1/1     Running   0          4h46m
+argocd-repo-server-6b5cf77fbc-nvm92   1/1     Running   0          4h46m
+argocd-server-86f7f94488-lbbbs        1/1     Running   0          4m59s
+```       
+> 👉 argocd-server-86f7f94488-lbbbs라는 pod이 새로 생성되어 Running 상태가 된 것을 확인할 수 있다.        
+
+
+4. 새로운 비밀번호 확인      
+
+<br>
+
+4-1. 새로 지정된 ArgoCD의 Password 확인        
+
+🧲 (COPY)     
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+```       
+✔ **(수행코드/결과)**  
+
+```bash
+ubuntu@ip-10-0-11-40:~$ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+qtPgRNqxJDjjlAun
+```       
+
+
+5. 새로운 비밀번호로 ArgoCD Web 접속    
+
+<br>
+
+5-1. argocd 접속 url(endpoint) 확인(아래 명령어 EXTERNAL-IP 결과로 표출)    
+
+🧲 (COPY)     
+```bash
+kubectl get svc -n argocd
+```       
+✔ **(수행코드/결과)**  
+
+```bash
+ubuntu@ip-10-0-11-40:~$ kubectl get svc -n argocd
+NAME                    TYPE           CLUSTER-IP       EXTERNAL-IP                                                                    PORT(S)                      AGE
+argocd-dex-server       ClusterIP      172.20.27.136    <none>                                                                         5556/TCP,5557/TCP,5558/TCP   5h4m
+argocd-metrics          ClusterIP      172.20.223.52    <none>                                                                         8082/TCP                     5h4m
+argocd-redis            ClusterIP      172.20.150.183   <none>                                                                         6379/TCP                     5h4m
+argocd-repo-server      ClusterIP      172.20.124.220   <none>                                                                         8081/TCP,8084/TCP            5h4m
+argocd-server           LoadBalancer   172.20.236.231   a1647c7b540474c449e1bbf6e01a96f3-2124658133.us-east-1.elb.amazonaws.com   80:31869/TCP,443:31481/TCP   5h4m
+argocd-server-metrics   ClusterIP      172.20.148.74    <none>                                                                         8083/TCP                     5h4m
+```       
+> 👉 위 예시의 경우 "a1647c7b540474c449e1bbf6e01a96f3-2124658133.us-east-1.elb.amazonaws.com" endpoint 확인 후 아래 url로 Chrome으로 접속
+"http://a1647c7b540474c449e1bbf6e01a96f3-2124658133.us-east-1.elb.amazonaws.com"
+
+
+
+<br>
+---
+
+## 별첨.Crontab 명령어
+
+1. Crontab 조회 (ubuntu 계정)
+
+```bash
+crontab -l -u ubuntu
+```
+
+2. Crontab 편집 (ubuntu 계정)
+
+```bash
+crontab -e -u ubuntu
+```
+
+2-1. 편집 시 본인이 편한 편집기를 사용할 수 있다. (default vim은 2번)
+
+<br>
