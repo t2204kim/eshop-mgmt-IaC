@@ -136,6 +136,7 @@ ignoreDifferences:
       - /data/jenkins-admin-password
 ```
 
+<br>
 
 ## 별첨.**Admin Server 접속하기**
 
