@@ -144,16 +144,16 @@ resource "aws_security_group" "admin_sg" {
 #   security_group_id = aws_security_group.bastion_sg.id
 # }
 
-resource "aws_security_group_rule" "bastion-ssh-office" {
-  description       = "office"
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "TCP"
+# resource "aws_security_group_rule" "bastion-ssh-office" {
+#   description       = "office"
+#   type              = "ingress"
+#   from_port         = 22
+#   to_port           = 22
+#   protocol          = "TCP"
 
-  cidr_blocks       = ["121.133.133.0/24", "221.167.219.0/24"] 
-  security_group_id = aws_security_group.bastion_sg.id
-}
+#   cidr_blocks       = ["121.133.133.0/24", "221.167.219.0/24"] 
+#   security_group_id = aws_security_group.bastion_sg.id
+# }
 
 resource "aws_security_group_rule" "bastion-ssh-us-east-1" {
 
