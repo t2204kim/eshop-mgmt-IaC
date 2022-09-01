@@ -39,6 +39,8 @@ resource aws_instance "bastion" {
   tags = {
     Name = "eshop-bastion-server" 
   }
+
+  lifecycle { ignore_changes = [security_groups] }
 }
 
 
@@ -55,6 +57,8 @@ resource aws_instance "admin" {
   subnet_id       = module.vpc.private_subnet_id[0]
   security_groups = [aws_security_group.admin_sg.id]
   key_name    = var.my_keypair
+
+  lifecycle { ignore_changes = [security_groups] }
 
   user_data = <<EOF
 #!/bin/bash
@@ -129,20 +133,20 @@ resource "aws_security_group" "admin_sg" {
   }
 }
 
-# data "http" "get_my_public_ip" {
-#   url = "https://ifconfig.co/ip"
-# }
+data "http" "get_my_public_ip" {
+  url = "https://ifconfig.co/ip"
+}
 
-# resource "aws_security_group_rule" "bastion-ssh-myip" {
-#   description       = "my public ip"
-#   type              = "ingress"
-#   from_port         = 22
-#   to_port           = 22
-#   protocol          = "TCP"
+resource "aws_security_group_rule" "bastion-ssh-myip" {
+  description       = "my public ip"
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "TCP"
 
-#   cidr_blocks       = ["${chomp(data.http.get_my_public_ip.body)}/32"] 
-#   security_group_id = aws_security_group.bastion_sg.id
-# }
+  cidr_blocks       = ["${chomp(data.http.get_my_public_ip.body)}/32"] 
+  security_group_id = aws_security_group.bastion_sg.id
+}
 
 # resource "aws_security_group_rule" "bastion-ssh-office" {
 #   description       = "office"
