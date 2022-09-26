@@ -144,7 +144,7 @@ resource "aws_security_group_rule" "bastion-ssh-myip" {
   to_port           = 22
   protocol          = "TCP"
 
-  cidr_blocks       = ["${chomp(data.http.get_my_public_ip.response_body )}/32"] 
+  cidr_blocks       = ["${chomp(data.http.get_my_public_ip.response_body )}/32"]
   security_group_id = aws_security_group.bastion_sg.id
 }
 
